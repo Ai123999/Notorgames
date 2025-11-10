@@ -1,0 +1,139 @@
+{
+  "log": {"level": "warn"},
+  "dns": {
+    "servers": [
+      {"tag": "remote", "address": "8.8.8.8"},
+      {"tag": "direct", "address": "local"}
+    ],
+    "rules": [
+      {"domain_suffix": ".ir", "server": "direct"},
+      {"rule_set": ["geoip-ir", "geosite-ir"], "server": "direct"}
+    ],
+    "final": "remote"
+  },
+  "inbounds": [
+    {
+      "type": "tun",
+      "tag": "tun-in",
+      "mtu": 9000,
+      "inet4_address": "172.19.0.1/28",
+      "auto_route": true,
+      "strict_route": true,
+      "stack": "mixed",
+      "sniff": true,
+      "sniff_override_destination": true
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "selector",
+      "tag": "Notorgamers Frankfurt",
+      "outbounds": ["Auto", "DE", "ES", "NL", "KZ", "IR Direct"],
+      "default": "Auto"
+    },
+    {
+      "type": "urltest",
+      "tag": "Auto",
+      "outbounds": ["DE", "ES", "NL", "KZ"],
+      "url": "https://cp.cloudflare.com/generate_204",
+      "interval": "3m",
+      "tolerance": 50
+    },
+    {
+      "type": "vless",
+      "tag": "DE",
+      "server": "mailru.outlinekeys.net",
+      "server_port": 443,
+      "uuid": "8ddd5c31-6981-4d62-a5fe-9e6ff76be195",
+      "flow": "xtls-rprx-vision",
+      "tls": {
+        "enabled": true,
+        "server_name": "mailru.outlinekeys.net",
+        "utls": {"enabled": true, "fingerprint": "chrome"},
+        "reality": {"enabled": true, "public_key": "70iSdeJIK7OnimAvzjq4AX9XVJx801nOWT_DhxTOlRU"}
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "ES",
+      "server": "tbankru.outlinekeys.net",
+      "server_port": 443,
+      "uuid": "8ddd5c31-6981-4d62-a5fe-9e6ff76be195",
+      "flow": "xtls-rprx-vision",
+      "tls": {
+        "enabled": true,
+        "server_name": "tbankru.outlinekeys.net",
+        "utls": {"enabled": true, "fingerprint": "chrome"},
+        "reality": {"enabled": true, "public_key": "WvNaAxI0W__qfUKbtysH4IwF155YENlv3PG6crCmPkA"}
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "NL",
+      "server": "alfabankru.outlinekeys.net",
+      "server_port": 443,
+      "uuid": "8ddd5c31-6981-4d62-a5fe-9e6ff76be195",
+      "flow": "xtls-rprx-vision",
+      "tls": {
+        "enabled": true,
+        "server_name": "alfabankru.outlinekeys.net",
+        "utls": {"enabled": true, "fingerprint": "chrome"},
+        "reality": {"enabled": true, "public_key": "3zn513ilYXOJngXLRP0MUnK23HuB9TKLjQ7YG20dzTQ"}
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "KZ",
+      "server": "maxru.outlinekeys.net",
+      "server_port": 443,
+      "uuid": "8ddd5c31-6981-4d62-a5fe-9e6ff76be195",
+      "flow": "xtls-rprx-vision",
+      "tls": {
+        "enabled": true,
+        "server_name": "maxru.outlinekeys.net",
+        "utls": {"enabled": true, "fingerprint": "chrome"},
+        "reality": {"enabled": true, "public_key": "zkeQCEkz7LlrzwzeG26Ae_HEk3_QlgM9CbiWJx5iWh0"}
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "direct",
+      "tag": "IR Direct"
+    },
+    {
+      "type": "block",
+      "tag": "block"
+    }
+  ],
+  "route": {
+    "rules": [
+      {"domain_suffix": ".ir", "outbound": "IR Direct"},
+      {"rule_set": ["geoip-ir", "geosite-ir"], "outbound": "IR Direct"}
+    ],
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "geoip-ir",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/hiddify/hiddify-geo/rule-set/country/geoip-ir.srs"
+      },
+      {
+        "type": "remote",
+        "tag": "geosite-ir",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/hiddify/hiddify-geo/rule-set/country/geosite-ir.srs"
+      }
+    ],
+    "final": "Notorgamers Frankfurt",
+    "auto_detect_interface": true
+  },
+  "experimental": {
+    "clash_api": {
+      "external_controller": "127.0.0.1:9090",
+      "secret": ""
+    }
+  }
+}
