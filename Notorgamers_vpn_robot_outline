@@ -1,139 +1,124 @@
-{
-  "log": {"level": "warn"},
-  "dns": {
-    "servers": [
-      {"tag": "remote", "address": "8.8.8.8"},
-      {"tag": "direct", "address": "local"}
-    ],
-    "rules": [
-      {"domain_suffix": ".ir", "server": "direct"},
-      {"rule_set": ["geoip-ir", "geosite-ir"], "server": "direct"}
-    ],
-    "final": "remote"
-  },
-  "inbounds": [
-    {
-      "type": "tun",
-      "tag": "tun-in",
-      "mtu": 9000,
-      "inet4_address": "172.19.0.1/28",
-      "auto_route": true,
-      "strict_route": true,
-      "stack": "mixed",
-      "sniff": true,
-      "sniff_override_destination": true
-    }
-  ],
-  "outbounds": [
-    {
-      "type": "selector",
-      "tag": "Notorgamers Frankfurt",
-      "outbounds": ["Auto", "DE", "ES", "NL", "KZ", "IR Direct"],
-      "default": "Auto"
-    },
-    {
-      "type": "urltest",
-      "tag": "Auto",
-      "outbounds": ["DE", "ES", "NL", "KZ"],
-      "url": "https://cp.cloudflare.com/generate_204",
-      "interval": "3m",
-      "tolerance": 50
-    },
-    {
-      "type": "vless",
-      "tag": "DE",
-      "server": "mailru.outlinekeys.net",
-      "server_port": 443,
-      "uuid": "8ddd5c31-6981-4d62-a5fe-9e6ff76be195",
-      "flow": "xtls-rprx-vision",
-      "tls": {
-        "enabled": true,
-        "server_name": "mailru.outlinekeys.net",
-        "utls": {"enabled": true, "fingerprint": "chrome"},
-        "reality": {"enabled": true, "public_key": "70iSdeJIK7OnimAvzjq4AX9XVJx801nOWT_DhxTOlRU"}
-      },
-      "packet_encoding": "xudp"
-    },
-    {
-      "type": "vless",
-      "tag": "ES",
-      "server": "tbankru.outlinekeys.net",
-      "server_port": 443,
-      "uuid": "8ddd5c31-6981-4d62-a5fe-9e6ff76be195",
-      "flow": "xtls-rprx-vision",
-      "tls": {
-        "enabled": true,
-        "server_name": "tbankru.outlinekeys.net",
-        "utls": {"enabled": true, "fingerprint": "chrome"},
-        "reality": {"enabled": true, "public_key": "WvNaAxI0W__qfUKbtysH4IwF155YENlv3PG6crCmPkA"}
-      },
-      "packet_encoding": "xudp"
-    },
-    {
-      "type": "vless",
-      "tag": "NL",
-      "server": "alfabankru.outlinekeys.net",
-      "server_port": 443,
-      "uuid": "8ddd5c31-6981-4d62-a5fe-9e6ff76be195",
-      "flow": "xtls-rprx-vision",
-      "tls": {
-        "enabled": true,
-        "server_name": "alfabankru.outlinekeys.net",
-        "utls": {"enabled": true, "fingerprint": "chrome"},
-        "reality": {"enabled": true, "public_key": "3zn513ilYXOJngXLRP0MUnK23HuB9TKLjQ7YG20dzTQ"}
-      },
-      "packet_encoding": "xudp"
-    },
-    {
-      "type": "vless",
-      "tag": "KZ",
-      "server": "maxru.outlinekeys.net",
-      "server_port": 443,
-      "uuid": "8ddd5c31-6981-4d62-a5fe-9e6ff76be195",
-      "flow": "xtls-rprx-vision",
-      "tls": {
-        "enabled": true,
-        "server_name": "maxru.outlinekeys.net",
-        "utls": {"enabled": true, "fingerprint": "chrome"},
-        "reality": {"enabled": true, "public_key": "zkeQCEkz7LlrzwzeG26Ae_HEk3_QlgM9CbiWJx5iWh0"}
-      },
-      "packet_encoding": "xudp"
-    },
-    {
-      "type": "direct",
-      "tag": "IR Direct"
-    },
-    {
-      "type": "block",
-      "tag": "block"
-    }
-  ],
-  "route": {
-    "rules": [
-      {"domain_suffix": ".ir", "outbound": "IR Direct"},
-      {"rule_set": ["geoip-ir", "geosite-ir"], "outbound": "IR Direct"}
-    ],
-    "rule_set": [
-      {
-        "type": "remote",
-        "tag": "geoip-ir",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/hiddify/hiddify-geo/rule-set/country/geoip-ir.srs"
-      },
-      {
-        "type": "remote",
-        "tag": "geosite-ir",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/hiddify/hiddify-geo/rule-set/country/geosite-ir.srs"
-      }
-    ],
-    "final": "Notorgamers Frankfurt",
-    "auto_detect_interface": true
-  },
-  "experimental": {
-    "clash_api": {
-      "external_controller": "127.0.0.1:9090",
-      "secret": ""
-    }
-  }
-}
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@85.208.110.183:8880?encryption=none&security=none&type=grpc#1@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@85.208.110.217:8880?encryption=none&security=none&type=grpc#2@t.me/Notorgamers
+vless://f61a4285-7264-4d07-9408-7b9ba1922c26@159.246.55.253:2096?encryption=none&security=tls&sni=gaosir.unfeeling.sbs&fp=chrome&type=ws&host=gaosir.unfeeling.sbs&path=%2F#3@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@84.246.85.198:8880?encryption=none&security=none&type=grpc#4@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@85.208.110.41:8880?encryption=none&security=none&type=grpc#5@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@86.104.74.155:8880?encryption=none&security=none&type=grpc#6@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@195.42.233.94:8880?encryption=none&security=none&type=grpc#7@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@94.131.118.37:8880?encryption=none&security=none&type=grpc#8@t.me/Notorgamers
+vless://f0758892-f40c-412d-9fab-88103bad1fd8@ov-france2.09vpn.com:80?encryption=none&security=none&type=ws&host=---%40External_Net---%40External_Net---%40External_Net---%40External_Net---%40External_Net&path=%2Fvless%2F#9@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@195.42.233.92:8880?encryption=none&security=none&type=grpc#10@t.me/Notorgamers
+vless://ef990239-e1a9-4dd3-987f-210ad419d652@157.90.131.220:443?encryption=none&security=reality&sni=www.microsoft.com&fp=safari&pbk=RcroOORjUo-hGbycJM6kmO9rG6_ABTzIl8UV0gKKCCI&sid=40f0a3e278fac049&type=grpc&authority=&serviceName=f2a913d3b25d35c1befad6dc&mode=gun#11@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@94.131.118.39:8880?encryption=none&security=none&type=grpc#12@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.164.6.156:8880?encryption=none&security=none&fp=chrome&type=grpc#13@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@185.231.205.155:8880?encryption=none&security=none&type=grpc#14@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@85.208.110.38:8880?encryption=none&security=none&type=grpc#15@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@94.131.118.98:8880?encryption=none&security=none&type=grpc#16@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.164.6.149:8880?encryption=none&security=none&fp=chrome&type=grpc#17@t.me/Notorgamers
+vless://e16a35ea-6715-4e75-9845-d20358bd0876@94.232.247.168:41360?encryption=none&security=reality&sni=yahoo.com&fp=chrome&pbk=TY6w1zP-qUFKVCAQdQT2ZEJsZBrPO4hZjZYBSS6h6DU&sid=1aab45&type=tcp&headerType=none#18@t.me/Notorgamers
+vless://f97211b0-1564-4f3b-a88b-f39d536a01a1@arcwarden.fonixapp.org:29993?encryption=none&flow=xtls-rprx-vision&security=reality&sni=merriam-webster.com&fp=chrome&pbk=uI8gEGoSUu0Dbs8ng8wHZZaiyGPopE4eLBfoEOZybW8&sid=a2&spx=%2F&type=tcp&headerType=none#19@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@86.104.74.177:8880?encryption=none&security=none&type=grpc#20@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@88.218.93.159:8880?encryption=none&security=none&type=grpc#21@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@86.104.74.62:8880?encryption=none&security=none&type=grpc#22@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.164.6.156:8880?encryption=none&security=none&type=grpc#23@t.me/Notorgamers
+vless://f0758892-f40c-412d-9fab-88103bad1fd8@51.38.232.101:80?encryption=none&security=none&type=ws&host=Join---PLANB-PROXY&path=%2Fvless%2F#24@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@94.131.122.221:8880?encryption=none&security=none&type=grpc#25@t.me/Notorgamers
+vless://f0758892-f40c-412d-9fab-88103bad1fd8@51.38.232.101:80?encryption=none&security=none&type=ws&path=%2Fvless%2F#26@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@85.208.110.205:8880?encryption=none&security=none&type=grpc#27@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@91.228.10.89:8880?encryption=none&security=none&type=grpc#28@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.164.37.43:8880?encryption=none&security=none&type=grpc#29@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.164.37.76:8880?encryption=none&security=none&fp=chrome&type=grpc#30@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.164.6.149:8880?encryption=none&security=none&type=grpc#31@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.164.6.79:8880?encryption=none&security=none&type=grpc#32@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.179.217.174:8880?encryption=none&security=none&type=grpc#33@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638977742221947111.warsaw-blkaft-aaav.info:8880?encryption=none&security=none&type=grpc#34@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@86.104.74.155:8880?encryption=none&security=none&fp=chrome&type=grpc#35@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.164.18.181:8880?encryption=none&security=none&type=grpc#36@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.164.88.186:8880?encryption=none&security=none&fp=chrome&type=grpc#37@t.me/Notorgamers
+vless://f61a4285-7264-4d07-9408-7b9ba1922c26@5.42.220.253:8443?encryption=none&security=tls&sni=gaosir.unfeeling.sbs&fp=chrome&type=ws&host=gaosir.unfeeling.sbs&path=%2Fx%40%E8%8A%82%E7%82%B9%E7%8B%82%E9%AD%94#38@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.164.37.76:8880?encryption=none&security=none&sni=/?BIA_TELEGRAM&alpn=http%2F1.1&fp=chrome&type=grpc#39@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.164.88.186:8880?encryption=none&security=none&type=grpc#40@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@91.228.10.89:8880?encryption=none&security=none&fp=chrome&type=grpc#41@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@195.42.233.107:8880?encryption=none&security=none&type=grpc#42@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638943819862861158.oslo-prx-dnraacp.info:8880?encryption=none&security=none&type=grpc#43@t.me/Notorgamers
+vless://e0976e35-a651-4f34-b5b1-c9ac9f75cb74@172.67.133.33:8443?encryption=none&security=tls&sni=private.besttotaldns.com&allowInsecure=1&type=ws&host=private.besttotaldns.com&path=%2FJ5aKLOY1R7ONXYCM#44@t.me/Notorgamers
+vless://ed20fe46-832a-4f61-a26d-33aebb463a9d@65.109.207.29:2052?encryption=none&security=none&type=tcp&headerType=none&host=TELEGRAM--KANAL--JKVPN--JKVPN--JKVPN--JKVPN--JKVPN--JKVPN#45@t.me/Notorgamers
+vless://faaaf16e-188e-42f2-bcc1-17feadc84fad@151.236.15.72:444?encryption=none&flow=xtls-rprx-vision&security=reality&sni=opensuse.org&fp=chrome&pbk=FOSoac3DIrSrCUcBtQA-BdHMxCtqe2CYCpdvGxKMiUw&sid=82b9ca5d8d39ba72&type=tcp&headerType=none#46@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638959783653647289.lahijan-blkaft-aaao.info:8880?encryption=none&security=none&type=grpc#47@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638984055889828458.belgrade-drcn-aaaai.info:8880?encryption=none&security=none&type=grpc#48@t.me/Notorgamers
+vless://f0758892-f40c-412d-9fab-88103bad1fd8@51.38.232.101:80?encryption=none&security=none&type=ws&host=Join---ShadowProxy66&path=%2Fvless%2F#49@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@84.246.85.62:8880?encryption=none&security=none&type=grpc#50@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@195.42.233.47:8880?encryption=none&security=none&type=grpc#51@t.me/Notorgamers
+vless://f61a4285-7264-4d07-9408-7b9ba1922c26@159.246.55.253:2096?encryption=none&security=tls&sni=gaosir.unfeeling.sbs&fp=chrome&type=ws&host=gaosir.unfeeling.sbs&path=%2F%40V2ray_confing33%2F#52@t.me/Notorgamers
+vless://f61a4285-7264-4d07-9408-7b9ba1922c26@159.246.55.253:2096?encryption=none&security=tls&sni=gaosir.unfeeling.sbs&fp=chrome&type=ws&host=gaosir.unfeeling.sbs&path=%2F%3FTELEGRAM-MARAMBASHI_MARAMBASHI_MARAMBASHI_MARAMBASHI%3Fed%3D512#53@t.me/Notorgamers
+vless://7556317c-dff6-46e8-ad29-b408f2a6456e@45.192.224.253:2096?encryption=none&security=tls&sni=vless.muzheng.top&fp=chrome&type=ws&host=vless.muzheng.top&path=%2F#54@t.me/Notorgamers
+vless://70162051-6706-4972-ae6f-202742f8e32c@eng30.digitunnel.org:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.abingdon.org.uk&fp=chrome&pbk=BhTJ3phnq-Z-10aFKSsj1lzhA8mULR4L6leE4-0WTAs&spx=%2F&type=tcp&headerType=none&host=PLANB_NET---Join---PLANB_NET---Join---PLANB_NET---Join---PLANB_NET#55@t.me/Notorgamers
+vless://22367c45-f6c4-4ca8-1d52-d9787d7bbe91@cf.877774.xyz:2083?encryption=none&security=tls&sni=cm2-bpg.ggff.net&type=ws&host=cm2-bpg.ggff.net&path=%2Fproxyip%3Dtw.ttzxw.cf%3A443#56@t.me/Notorgamers
+vless://70162051-6706-4972-ae6f-202742f8e32c@eng30.digitunnel.org:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.abingdon.org.uk&fp=chrome&pbk=BhTJ3phnq-Z-10aFKSsj1lzhA8mULR4L6leE4-0WTAs&spx=%2F%40sinavm-%40sinavm&type=tcp&headerType=none#57@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638934319458527217.zagreb-drc-tusaby.info:8880?encryption=none&security=none&type=grpc#58@t.me/Notorgamers
+vless://5ec3a039-ea63-4bf9-a848-a65c9bfa66f5@www.speedtest.net:443?encryption=none&security=tls&sni=gb-8981.shenzogmbh.com&type=ws&host=gb-8981.shenzogmbh.com&path=%2Fapi%2Fv1#59@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638944337658439808.dezful-prx-dnraacp.info:8880?encryption=none&security=none&type=grpc#60@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638929320863717328.malayer-drc-tusabq.info:8880?encryption=none&security=none&type=grpc#61@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638937544595891094.madrid-prx-dnraacl.info:8880?encryption=none&security=none&type=grpc#62@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638943040460374197.qazvin-prx-dnraacm.info:8880?encryption=none&security=none&type=grpc#63@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638943929060330315.warsaw-prx-dnraacp.info:8880?encryption=none&security=none&type=grpc#64@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638946555860201969.lisbon-prx-dnraacq.info:8880?encryption=none&security=none&type=grpc#65@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638946555860213179.lisbon-prx-dnraacq.info:8880?encryption=none&security=none&type=grpc#66@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638946986851068158.hamedan-drc-tusabl.info:8880?encryption=none&security=none&type=grpc#67@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638971626453013983.gorgan-blkaft-aaax.info:8880?encryption=none&security=none&type=grpc#68@t.me/Notorgamers
+vless://86c50e3a-5b87-49dd-bd20-03c7f2735e40@blog.cloudflare.com:2095?encryption=none&security=none&type=ws&host=freedom.pusytroller.cf&path=%2F#69@t.me/Notorgamers
+vless://f0758892-f40c-412d-9fab-88103bad1fd8@51.38.232.101:80?encryption=none&security=none&type=ws&host=v_ngfree---v_ngfree---v_ngfree---v_ngfree---v_ngfree---v_ngfree---v_ngfree---v_ngfree---v_ngfree---v_ngfree%26&path=%2Fvless%2F#70@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638950330462892661.neyshabur-prx-dnraacr.info:8880?encryption=none&security=none&type=grpc#71@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638959700852258728.esfahan-blkaft-aaao.info:8880?encryption=none&security=none&type=grpc#72@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638974563192163059.stockholm-drcn-aaaad.info:8880?encryption=none&security=none&type=grpc#73@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638970192452860730.helsinki-blkaft-aaax.info:8880?encryption=none&security=none&type=grpc#74@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638947655065548930.bandar-prx-dnraacq.info:8880?encryption=none&security=none&type=grpc#75@t.me/Notorgamers
+vless://5ec3a039-ea63-4bf9-a848-a65c9bfa66f5@77.37.33.39:443?encryption=none&security=tls&sni=gb-8981.shenzogmbh.com&fp=chrome&type=ws&host=gb-8981.shenzogmbh.com&path=%2Fapi%2Fv1#76@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@45.159.248.108:8880?encryption=none&security=none&type=grpc#77@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638953873686412975.lahijan-drc-tusaas.info:8880?encryption=none&security=none&type=grpc#78@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@45.140.167.49:8880?encryption=none&security=none&type=grpc#79@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638952778316595617.hamedan-drc-tusaas.info:8880?encryption=none&security=none&type=grpc#80@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638959700852270917.esfahan-blkaft-aaao.info:8880?encryption=none&security=none&type=grpc#81@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@86.104.74.73:8880?encryption=none&security=none&type=grpc#82@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@45.140.167.209:8880?encryption=none&security=none&type=grpc#83@t.me/Notorgamers
+vless://638c1918-f6f0-4ecc-85e6-a3ac50ed9c02@157.180.123.25:443?encryption=none&security=none&type=ws&host=157.180.123.25&path=%2Flinkws%3Fed%3D2560#84@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@45.89.111.80:8880?encryption=none&security=none&type=grpc#85@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@85.209.153.82:8880?encryption=none&security=none&type=grpc#86@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638950280342844263.esfahan-drc-tusaas.info:8880?encryption=none&security=none&type=grpc#87@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638965946052583460.arak-blkaft-aaas.info:8880?encryption=none&security=none&type=grpc#88@t.me/Notorgamers
+vless://5ec3a039-ea63-4bf9-a848-a65c9bfa66f5@77.37.33.39:443?encryption=none&security=tls&sni=gb-8981.shenzogmbh.com&alpn=h3h2&fp=chrome&type=ws&host=gb-8981.shenzogmbh.com&path=%2Fapi%2Fv1#89@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@45.140.167.172:8880?encryption=none&security=none&type=grpc#90@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638946986851076125.hamedan-drc-tusabl.info:8880?encryption=none&security=none&type=grpc#91@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638949521660379297.copenhagen-prx-dnraacr.info:8880?encryption=none&security=none&type=grpc#92@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638950280342832628.esfahan-drc-tusaas.info:8880?encryption=none&security=none&type=grpc#93@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638951859202353992.amsterdam-prx-dnraacs.info:8880?encryption=none&security=none&type=grpc#94@t.me/Notorgamers
+vless://5ec3a039-ea63-4bf9-a848-a65c9bfa66f5@104.26.6.89:443?encryption=none&security=tls&sni=gb-021.shenzogmbh.com&fp=chrome&type=ws&host=gb-021.shenzogmbh.com&path=%2Fapi%2Fv1#95@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@45.140.167.213:8880?encryption=none&security=none&sni=---@AZARBAYKAB1---@AZARBAYJAB1---@AZARBAYJAB1---@AZARBAYJAB1---@AZARBAYJAB1&alpn=h3%2Ch2%2Chttp%2F1.1&fp=chrome&type=grpc#96@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638931272656134408.malayer-drc-tusabu.info:8880?encryption=none&security=none&type=grpc#97@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638950315458723899.kerman-prx-dnraacr.info:8880?encryption=none&security=none&type=grpc#98@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638950330462896620.neyshabur-prx-dnraacr.info:8880?encryption=none&security=none&type=grpc#99@t.me/Notorgamers
+vless://3a1db84b-37ef-4061-ac3a-6165d52ca803@91.107.146.223:28460?encryption=none&security=none&type=tcp&headerType=none#100@t.me/Notorgamers
+vless://5ec3a039-ea63-4bf9-a848-a65c9bfa66f5@104.26.6.89:443?encryption=none&security=tls&sni=gb-8981.shenzogmbh.com&alpn=h3h2&fp=chrome&type=ws&host=gb-8981.shenzogmbh.com&path=%2Fapi%2Fv1#101@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@45.140.167.173:8880?encryption=none&security=none&type=grpc#102@t.me/Notorgamers
+vless://3e7140c5-cbc5-4aff-b232-60efa91ebe1b@152.53.146.76:36659?encryption=none&flow=xtls-rprx-vision&security=reality&sni=smallpdf.com&fp=chrome&pbk=O9IS_8x48rpsn5YovE6lIaJzp_PtzKcyIyeCxPWdwnE&sid=6e&spx=%2F%40Evay_vpn----%40Evay_vpn----%40Evay_vpn----%40Evay_vpn----%40Evay_vpn----%40Evay_vpn----%40Evay_vpn----%40Evay_vpn----%40Evay_vpn----%40Evay_vpn----%40Evay_vpn&type=tcp&headerType=none#103@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638950315458711931.kerman-prx-dnraacr.info:8880?encryption=none&security=none&type=grpc#104@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.164.37.76:8880?encryption=none&security=none&sni=/?BIA_TELEGRAM (@AZARBAYJAB1) TM (@AZARBAYJAB1) TM (@AZARBAYJAB1) TM (@AZARBAYJAB1) TM (@AZARBAYJAB1) TM (@AZARBAYJAB1)&alpn=http%2F1.1&fp=chrome&type=grpc#105@t.me/Notorgamers
+vless://c25a90ea-6a3b-4d87-95b3-8ca4232f2a6e@facelessvoid.fonixapp.org:36563?encryption=none&flow=xtls-rprx-vision&security=reality&sni=expedia.com&fp=chrome&pbk=tPpkzwOVa4li8CurZc07pnxl8ytBUm9x4b9TBP99h00&sid=c294d6ba98e6a7&spx=%2F&type=tcp&headerType=none#106@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@195.42.233.82:8880?encryption=none&security=none&type=grpc#107@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638936664855921747.amsterdam-prx-dnraacl.info:8880?encryption=none&security=none&type=grpc#108@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638940926058862147.stockholm-prx-dnraacm.info:8880?encryption=none&security=none&type=grpc#109@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638948510129819106.dezful-drc-tusaas.info:8880?encryption=none&security=none&type=grpc#110@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638961293929373584.rasht-drc-tusaas.info:8880?encryption=none&security=none&type=grpc#111@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@95.164.6.169:8880?encryption=none&security=none&type=grpc#112@t.me/Notorgamers
+vless://74a4f351-1f64-4a24-98ac-a1a86dba7f4c@104.21.5.65:8443?encryption=none&security=tls&sni=dedi.besttotaldns.com&allowInsecure=1&type=ws&host=dedi.besttotaldns.com&path=%2FJ5aKLOY1R9ONWYCM#113@t.me/Notorgamers
+vless://e923e0d4-ddc2-4511-bfe2-3942643bdc36@104.16.1.106:8080?encryption=none&security=none&type=xhttp&host=shop.slimshopboyss.ir&path=%2F&mode=auto#114@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@195.42.233.5:8880?encryption=none&security=none&type=grpc#115@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@195.42.233.69:8880?encryption=none&security=none&type=grpc#116@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638948510129819770.dezful-drc-tusaas.info:8880?encryption=none&security=none&type=grpc#117@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@195.42.233.89:8880?encryption=none&security=none&type=grpc#118@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@45.12.133.224:8880?encryption=none&security=none&type=grpc#119@t.me/Notorgamers
+vless://cc67ca7f-064e-4117-ac31-a66d5728a11c@fl-3-direct.djarbnet.ru:443?encryption=none&security=tls&sni=fl-3-direct.djarbnet.ru&type=ws&path=%2Fgetupdates#120@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@45.140.167.172:8880?encryption=none&security=none&sni= [By EbraSha] vless-GB&alpn=h3%2Ch2%2Chttp%2F1.1&fp=chrome&type=grpc#121@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@638967288453104894.lahijan-blkaft-aaap.info:8880?encryption=none&security=none&type=grpc#122@t.me/Notorgamers
+vless://c3302b07-7717-465a-bf5e-83ac9e9b133d@38.190.150.75:4655?encryption=none&security=none&type=tcp&headerType=none#123@t.me/Notorgamers
+vless://df0680ca-e43c-498d-ed86-8e196eedd012@195.42.233.96:8880?encryption=none&s
