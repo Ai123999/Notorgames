@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NotorgamesBot Mini App</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0a0c14;
+    --bg2: #111420;
+    --bg3: #181c2e;
+    --accent: #7c5cfc;
+    --accent2: #fc5c7d;
+    --accent3: #43e97b;
+    --text: #e8ecff;
+    --text2: #8892b0;
+    --border: rgba(124,92,252,0.18);
+    --card: rgba(24,28,46,0.95);
+    --glow: 0 0 24px rgba(124,92,252,0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(124,92,252,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,92,252,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(124,92,252,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: pulse 8s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 1; }
+  }
+
+  /* ─── LAYOUT ─── */
+  #app {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    padding: 14px 16px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,12,20,0.85);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-logo {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    box-shadow: var(--glow);
+  }
+
+  .header-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    flex: 1;
+  }
+
+  .header-user {
+    font-size: 12px;
+    color: var(--text2);
+    text-align: right;
+    line-height: 1.3;
+  }
+
+  /* ─── SEARCH ─── */
+  .search-wrap {
+    padding: 14px 16px 8px;
+  }
+
+  .search-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 10px 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-bar:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(124,92,252,0.12);
+  }
+
+  .search-bar input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 15px;
+  }
+
+  .search-bar input::placeholder { color: var(--text2); }
+
+  .search-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--accent);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    transition: transform 0.15s;
+  }
+  .search-btn:active { transform: scale(0.88); }
+
+  /* ─── NAV TABS ─── */
+  .nav-tabs {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    gap: 6px;
+    padding: 0 16px 10px;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    flex-shrink: 0;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text2);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--accent), rgba(124,92,252,0.5));
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: var(--glow);
+  }
+
+  .tab-btn:active { transform: scale(0.95); }
+
+  /* ─── CONTENT ─── */
+  .content {
+    flex: 1;
+    padding: 8px 16px 80px;
+    overflow-y: auto;
+  }
+
+  .section { display: none; animation: fadeIn 0.25s ease; }
+  .section.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .card:active { border-color: var(--accent); box-shadow: var(--glow); }
+
+  .card-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  /* ─── GAME RESULT CARD ─── */
+  .game-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+  }
+
+  .game-card:active, .game-card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--glow);
+    transform: translateX(3px);
+  }
+
+  .game-icon {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .game-info { flex: 1; overflow: hidden; }
+  .game-name {
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .game-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  .game-arrow { color: var(--accent); font-size: 18px; }
+
+  /* ─── GENRE CHIPS ─── */
+  .genres-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .genre-chip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text2);
+  }
+
+  .genre-chip:active, .genre-chip.active {
+    background: rgba(124,92,252,0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ─── PROFILE ─── */
+  .profile-banner {
+    background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(252,92,125,0.1));
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px 20px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .profile-avatar {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 12px;
+    box-shadow: 0 0 30px rgba(124,92,252,0.4);
+  }
+
+  .profile-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+
+  .profile-id {
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .stat-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 2px;
+  }
+
+  /* ─── FAQ ACCORDION ─── */
+  .faq-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .faq-item.open { border-color: rgba(124,92,252,0.4); }
+
+  .faq-question {
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+    font-size: 14px;
+    user-select: none;
+  }
+
+  .faq-chevron {
+    color: var(--accent);
+    font-size: 18px;
+    transition: transform 0.25s;
+    flex-shrink: 0;
+  }
+  .faq-item.open .faq-chevron { transform: rotate(180deg); }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.2s;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+    padding: 0 16px;
+  }
+  .faq-item.open .faq-answer {
+    max-height: 400px;
+    padding: 0 16px 14px;
+  }
+
+  /* ─── BUTTON ─── */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), rgba(124,92,252,0.7));
+    color: #fff;
+    box-shadow: var(--glow);
+  }
+
+  .btn-secondary {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
+    color: #0a0c14;
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, var(--accent2), #f093fb);
+    color: #fff;
+  }
+
+  .btn:active { transform: scale(0.97); opacity: 0.9; }
+
+  /* ─── INPUT ─── */
+  .input-field {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 14px;
+    outline: none;
+    margin-bottom: 10px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    resize: vertical;
+  }
+  .input-field:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(124,92,252,0.12);
+  }
+  .input-field::placeholder { color: var(--text2); }
+
+  /* ─── SECTION HEADER ─── */
+  .sec-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sec-title::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(180deg, var(--accent), var(--accent2));
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text2);
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; line-height: 1.6; }
+
+  /* ─── TOAST ─── */
+  #toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(24,28,46,0.95);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 13px;
+    color: var(--text);
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+    box-shadow: var(--glow);
+    max-width: 90vw;
+    white-space: normal;
+    text-align: center;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ─── LANG SWITCHER ─── */
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .lang-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+  }
+
+  .lang-btn .flag { font-size: 28px; margin-bottom: 6px; }
+  .lang-btn .lang-name { font-size: 13px; font-weight: 500; }
+
+  .lang-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,92,252,0.15);
+    box-shadow: var(--glow);
+  }
+
+  .lang-btn:active { transform: scale(0.95); }
+
+  /* ─── QUEST ─── */
+  .quest-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quest-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--accent3), #06b6d4);
+  }
+
+  .quest-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .quest-name { font-weight: 600; font-size: 14px; }
+  .quest-reward {
+    background: rgba(67,233,123,0.15);
+    border: 1px solid rgba(67,233,123,0.3);
+    color: var(--accent3);
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+
+  .quest-desc { font-size: 13px; color: var(--text2); margin-bottom: 10px; line-height: 1.4; }
+
+  .progress-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent3), #06b6d4);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+  }
+
+  .progress-text {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 4px;
+    text-align: right;
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+
+  /* ─── BADGE ─── */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 6px;
+  }
+  .badge-new { background: rgba(252,92,125,0.2); color: var(--accent2); border: 1px solid rgba(252,92,125,0.3); }
+  .badge-hot { background: rgba(252,154,27,0.2); color: #fc9a1b; border: 1px solid rgba(252,154,27,0.3); }
+
+  /* ─── BOTTOM NAV ─── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10,12,20,0.92);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 200;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 4px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text2);
+    font-size: 10px;
+    font-weight: 500;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .nav-item .nav-icon { font-size: 22px; transition: transform 0.2s; }
+  .nav-item.active { color: var(--accent); }
+  .nav-item.active .nav-icon { transform: scale(1.15); }
+  .nav-item:active { opacity: 0.7; }
+
+  /* ─── LOADING ─── */
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 32px auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ─── SPEED TIPS ─── */
+  .tip-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .tip-item:last-child { border-bottom: none; }
+  .tip-num {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+    color: #fff;
+  }
+  .tip-content { flex: 1; }
+  .tip-title { font-weight: 600; font-size: 14px; margin-bottom: 3px; }
+  .tip-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-logo">🎮</div>
+    <div class="header-title">Notorgames_BOT</div>
+    <div class="header-user" id="headerUser">Загрузка...</div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <div class="search-bar">
+      <span style="font-size:18px;color:var(--text2)">🔍</span>
+      <input type="text" id="searchInput" placeholder="Введи название игры..." autocomplete="off" />
+      <button class="search-btn" onclick="doSearch()">⚡</button>
+    </div>
+  </div>
+
+  <!-- NAV TABS -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showSection('search')">🔍 Поиск</button>
+    <button class="tab-btn" onclick="showSection('genres')">🎭 Жанры</button>
+    <button class="tab-btn" onclick="showSection('order')">📋 Заказы</button>
+    <button class="tab-btn" onclick="showSection('faq')">❓ FAQ</button>
+    <button class="tab-btn" onclick="showSection('speed')">⚡ Ускорить</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ══ SEARCH SECTION ══ -->
+    <div class="section active" id="sec-search">
+      <div id="searchResults"></div>
+      <div id="searchPlaceholder">
+        <div class="sec-title">🔥 Популярные игры</div>
+        <div id="popularGames"></div>
+
+        <div class="divider"></div>
+        <div class="sec-title">🎲 Случайная игра</div>
+        <button class="btn btn-primary" onclick="loadRandom()">🎲 Случайный выбор</button>
+      </div>
+    </div>
+
+    <!-- ══ GENRES SECTION ══ -->
+    <div class="section" id="sec-genres">
+      <div class="sec-title">🎭 Список жанров</div>
+      <div id="genresContainer">
+        <div class="spinner"></div>
+      </div>
+    </div>
+
+    <!-- ══ ORDER SECTION ══ -->
+    <div class="section" id="sec-order">
+      <div class="sec-title">📋 Стол Заказов</div>
+      <div class="card" style="background:linear-gradient(135deg,rgba(124,92,252,0.1),rgba(252,92,125,0.07));border-color:rgba(124,92,252,0.3);">
+        <div style="font-size:36px;margin-bottom:10px;">📋</div>
+        <div class="card-title">Нет нужной игры?</div>
+        <div class="card-desc" style="margin-bottom:14px;">Оставь заявку в Столе Заказов — и мы добавим её! Там же можно посмотреть, что уже заказали другие.</div>
+        <a class="btn btn-primary" href="https://t.me/+FFG8EhyLHXY2NzIy" target="_blank">📋 Перейти в Стол Заказов</a>
+      </div>
+
+      <div class="divider"></div>
+      <div class="sec-title">🎮 Или напиши прямо здесь</div>
+      <textarea class="input-field" id="orderText" placeholder="Название игры на английском или русском..." rows="3"></textarea>
+      <button class="btn btn-secondary" onclick="submitOrder()">📨 Отправить заявку боту</button>
+
+      <div class="divider"></div>
+      <div class="sec-title">📢 Наши каналы</div>
+      <div class="game-card" onclick="openLink('https://t.me/+_bQ8sLeBNsQwOGYy')">
+        <div class="game-icon">🎮</div>
+        <div class="game-info">
+          <div class="game-name">Основной канал</div>
+          <div class="game-meta">Игры, новинки, раздачи</div>
+        </div>
+        <div class="game-arrow">›</div>
+      </div>
+      <div class="game-card" onclick="openLink('https://t.me/+RBggBwnSWtQwMTIy')">
+        <div class="game-icon">💻</div>
+        <div class="game-info">
+          <div class="game-name">Софт</div>
+          <div class="game-meta">Программы и утилиты</div>
+        </div>
+        <div class="game-arrow">›</div>
+      </div>
+      <div class="game-card" onclick="openLink('https://t.me/+2QYUvUCGA2A3NThi')">
+        <div class="game-icon">📦</div>
+        <div class="game-info">
+          <div class="game-name">Игры до 1 ГБ</div>
+          <div class="game-meta">Лёгкие игры без лишнего</div>
+        </div>
+        <div class="game-arrow">›</div>
+      </div>
+      <div class="game-card" onclick="openLink('https://t.me/+1a-sr6qDov05YWYy')">
+        <div class="game-icon">🕹️</div>
+        <div class="game-info">
+          <div class="game-name">Консольные игры</div>
+          <div class="game-meta">PS, Xbox, Switch</div>
+        </div>
+        <div class="game-arrow">›</div>
+      </div>
+      <div class="game-card" onclick="openLink('https://t.me/+Ma9NIyaQnH5hMWUy')">
+        <div class="game-icon">🎬</div>
+        <div class="game-info">
+          <div class="game-name">Фильмы</div>
+          <div class="game-meta">Новый канал с кино</div>
+        </div>
+        <div class="game-arrow">›</div>
+      </div>
+      <div class="game-card" onclick="openLink('https://t.me/+xmN73y9nAzxlMGMy')">
+        <div class="game-icon">💬</div>
+        <div class="game-info">
+          <div class="game-name">Наш чат</div>
+          <div class="game-meta">Общение и поддержка</div>
+        </div>
+        <div class="game-arrow">›</div>
+      </div>
+    </div>
+
+    <!-- ══ FAQ SECTION ══ -->
+    <div class="section" id="sec-faq">
+      <div class="sec-title">❓ Частые вопросы</div>
+      <div id="faqList"></div>
+    </div>
+
+    <!-- ══ SPEED SECTION ══ -->
+    <div class="section" id="sec-speed">
+      <div class="sec-title">⚡ Как ускорить загрузку</div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="tip-item">
+          <div class="tip-num">1</div>
+          <div class="tip-content">
+            <div class="tip-title">Telegram Desktop</div>
+            <div class="tip-desc">В Desktop-версии скорость загрузки значительно выше, чем на мобильном. Используй ПК или ноутбук для больших файлов.</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">2</div>
+          <div class="tip-content">
+            <div class="tip-title">Сохранение в облако Telegram</div>
+            <div class="tip-desc">Файлы хранятся в облаке Telegram — можно скачать повторно в любое время без потери качества.</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">3</div>
+          <div class="tip-content">
+            <div class="tip-title">Стабильный Wi-Fi</div>
+            <div class="tip-desc">Используй стабильный Wi-Fi вместо мобильного интернета. На 4G/5G скорость может быть нестабильной.</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">4</div>
+          <div class="tip-content">
+            <div class="tip-title">VPN для обхода блокировок</div>
+            <div class="tip-desc">Если загрузка медленная — попробуй включить VPN. Иногда маршрут через другой сервер даёт прирост скорости.</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">5</div>
+          <div class="tip-content">
+            <div class="tip-title">Параллельная закачка</div>
+            <div class="tip-desc">Telegram Desktop поддерживает одновременную загрузку нескольких файлов. Выбери несколько и скачивай сразу.</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="btn btn-primary" href="https://t.me/NotorVPN" target="_blank">🛡️ Быстрый VPN — NotorVPN</a>
+      <a class="btn btn-secondary" href="https://desktop.telegram.org/" target="_blank">🖥️ Скачать Telegram Desktop</a>
+
+      <div class="divider"></div>
+      <div style="font-size:13px;color:var(--text2);text-align:center;line-height:1.6;">
+        .NET 8.0 Runtime нужен для запуска некоторых Setup-файлов на Windows.<br>
+        <a href="https://dotnet.microsoft.com/en-us/download/dotnet/8.0" target="_blank" style="color:var(--accent);">Скачать .NET 8.0 →</a>
+      </div>
+    </div>
+
+  </div><!-- end .content -->
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-item active" id="nav-home" onclick="switchNav('home')">
+      <div class="nav-icon">🎮</div>
+      <div>Главная</div>
+    </div>
+    <div class="nav-item" id="nav-profile" onclick="switchNav('profile')">
+      <div class="nav-icon">👤</div>
+      <div>Профиль</div>
+    </div>
+    <div class="nav-item" id="nav-quests" onclick="switchNav('quests')">
+      <div class="nav-icon">⚔️</div>
+      <div>Квесты</div>
+    </div>
+    <div class="nav-item" id="nav-suggest" onclick="switchNav('suggest')">
+      <div class="nav-icon">💡</div>
+      <div>Предложить</div>
+    </div>
+    <div class="nav-item" id="nav-lang" onclick="switchNav('lang')">
+      <div class="nav-icon">🌐</div>
+      <div>Язык</div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay sections (profile, quests, suggest, lang) rendered into .content via JS -->
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════════
+//  TELEGRAM WEB APP INIT
+// ════════════════════════════════════════
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  tg.setHeaderColor('#0a0c14');
+  tg.setBackgroundColor('#0a0c14');
+}
+
+const user = tg?.initDataUnsafe?.user || {};
+const userName = user.first_name || user.username || 'Игрок';
+const userId = user.id || '—';
+
+document.getElementById('headerUser').innerHTML =
+  `${userName}<br><span style="font-size:10px;opacity:0.5">ID: ${userId}</span>`;
+
+// ════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════
+let currentSection = 'search';
+let currentNav = 'home';
+let selectedLang = localStorage.getItem('gamebotLang') || 'ru';
+let searchTimeout = null;
+let userDownloads = parseInt(localStorage.getItem('gamebotDownloads') || '0');
+let userSearches = parseInt(localStorage.getItem('gamebotSearches') || '0');
+
+// ════════════════════════════════════════
+//  MOCK DATA  (в реальном проекте — запросы к API бота)
+// ════════════════════════════════════════
+const POPULAR_GAMES = [
+  { name: 'SCARLET NEXUS', genre: 'Action RPG', icon: '⚔️' },
+  { name: 'NEKOPARA', genre: 'Visual Novel', icon: '🐱' },
+  { name: 'Neva', genre: 'Action', icon: '🐺' },
+  { name: 'Tales of the Neon Sea', genre: 'Adventure', icon: '🌆' },
+  { name: 'SCP: Secret Files', genre: 'Horror', icon: '🔒' },
+  { name: 'Secret pie', genre: 'Casual', icon: '🥧' },
+];
+
+const GENRES = [
+  { name: 'Action', count: 142 }, { name: 'RPG', count: 89 },
+  { name: 'Adventure', count: 76 }, { name: 'Visual Novel', count: 54 },
+  { name: 'Strategy', count: 48 }, { name: 'Horror', count: 43 },
+  { name: 'Puzzle', count: 38 }, { name: 'Simulation', count: 35 },
+  { name: 'Fighting', count: 31 }, { name: 'Platformer', count: 28 },
+  { name: 'Shooter', count: 27 }, { name: 'Casual', count: 24 },
+  { name: 'Sports', count: 19 }, { name: 'Racing', count: 17 },
+  { name: 'Stealth', count: 14 }, { name: 'Survival', count: 13 },
+  { name: 'JRPG', count: 12 }, { name: 'Roguelike', count: 11 },
+  { name: 'Metroidvania', count: 9 }, { name: 'Dating Sim', count: 8 },
+];
+
+const FAQ_DATA = [
+  {
+    q: '🎮 Как найти и скачать игру?',
+    a: 'Просто введи название игры в строку поиска или напиши боту. Бот найдёт файлы и отправит ссылки для скачивания прямо в чат.'
+  },
+  {
+    q: '📢 Зачем нужна подписка на канал?',
+    a: 'Подписка на канал — обязательное условие для использования бота. Там публикуются все новые игры, раздачи и обновления.'
+  },
+  {
+    q: '⚠️ Что будет если выйти из канала?',
+    a: 'При выходе из канала бот отправит предупреждение. После 3-го выхода доступ будет заблокирован на 3 месяца.'
+  },
+  {
+    q: '🔍 Игра не нашлась. Что делать?',
+    a: 'Попробуй написать полное название на английском языке. Если игры всё равно нет — оставь заявку в Столе Заказов.'
+  },
+  {
+    q: '🌐 Как сменить язык?',
+    a: 'Нажми на вкладку "Язык" в нижнем меню или используй команду /setlang в боте. Доступны: Русский, English, Українська.'
+  },
+  {
+    q: '⚡ Медленная загрузка файлов?',
+    a: 'Используй Telegram Desktop — там скорость значительно выше. Также попробуй подключить VPN или переключиться на Wi-Fi.'
+  },
+  {
+    q: '🎲 Что такое Случайная игра?',
+    a: 'Функция подбирает 10 случайных игр из базы. Нажми на любую, чтобы получить файлы.'
+  },
+  {
+    q: '🏆 Что такое Квесты?',
+    a: 'Квесты — это задания, которые можно выполнять для получения привилегий (приоритет в заказах, доступ к эксклюзиву и т.д.).'
+  },
+  {
+    q: '💡 Как предложить новую игру?',
+    a: 'Используй кнопку "Предложить" в нижнем меню — введи название игры и описание. Мы рассмотрим все заявки.'
+  },
+  {
+    q: '🛡️ Нужен ли .NET для запуска?',
+    a: 'Некоторые Setup-файлы требуют .NET 8.0 Runtime. Ссылку на скачивание можно найти во вкладке "Ускорить".'
+  },
+];
+
+const QUESTS = [
+  { name: '🎮 Первопроходец', desc: 'Скачай свою первую игру через бота', reward: '+1 заказ', max: 1, cur: Math.min(userDownloads, 1) },
+  { name: '📥 Качаю всё подряд', desc: 'Скачай 10 игр через бота', reward: 'Приоритет', max: 10, cur: Math.min(userDownloads, 10) },
+  { name: '🔍 Следопыт', desc: 'Выполни 20 поисков', reward: '+2 заказа', max: 20, cur: Math.min(userSearches, 20) },
+  { name: '📢 Амбассадор', desc: 'Пригласи друга через реферальную ссылку', reward: 'VIP статус', max: 1, cur: 0 },
+  { name: '🌍 Полиглот', desc: 'Смени язык интерфейса', reward: '+1 заказ', max: 1, cur: selectedLang !== 'ru' ? 1 : 0 },
+];
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+function init() {
+  renderPopularGames();
+  renderGenres();
+  renderFAQ();
+  setupSearch();
+}
+
+// ════════════════════════════════════════
+//  POPULAR GAMES
+// ════════════════════════════════════════
+function renderPopularGames() {
+  const container = document.getElementById('popularGames');
+  container.innerHTML = POPULAR_GAMES.map(g => `
+    <div class="game-card" onclick="openGameInBot('${g.name}')">
+      <div class="game-icon">${g.icon}</div>
+      <div class="game-info">
+        <div class="game-name">${g.name}</div>
+        <div class="game-meta">${g.genre}</div>
+      </div>
+      <div class="game-arrow">›</div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════
+//  SEARCH
+// ════════════════════════════════════════
+function setupSearch() {
+  const input = document.getElementById('searchInput');
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); doSearch(); }
+  });
+  input.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    const val = input.value.trim();
+    if (!val) {
+      document.getElementById('searchResults').innerHTML = '';
+      document.getElementById('searchPlaceholder').style.display = '';
+      return;
+    }
+    searchTimeout = setTimeout(() => doSearch(true), 400);
+  });
+}
+
+function doSearch(live = false) {
+  const input = document.getElementById('searchInput');
+  const query = input.value.trim();
+  if (!query) { showToast('Введи название игры'); return; }
+
+  userSearches++;
+  localStorage.setItem('gamebotSearches', userSearches);
+
+  // Filter mock data
+  const q = query.toLowerCase();
+  const allGames = [...POPULAR_GAMES,
+    { name: 'My Dream Setup', genre: 'Simulator', icon: '🖥️' },
+    { name: 'Sectio 8', genre: 'Shooter', icon: '🔫' },
+    { name: 'Альтушка', genre: 'Visual Novel', icon: '🎨' },
+  ];
+  const results = allGames.filter(g => g.name.toLowerCase().includes(q));
+
+  const resultsEl = document.getElementById('searchResults');
+  const placeholder = document.getElementById('searchPlaceholder');
+
+  if (results.length === 0) {
+    resultsEl.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-text">Игра <b>${escHtml(query)}</b> не найдена в топе.<br>
+        Напиши полное название на английском<br>или оставь заявку в Столе Заказов.</div>
+      </div>
+      <button class="btn btn-secondary" onclick="openOrderWithName('${escHtml(query)}')">📋 Заказать эту игру</button>
+      <button class="btn btn-primary" onclick="openGameInBot('${escHtml(query)}')">🤖 Спросить бота</button>
+    `;
+  } else {
+    resultsEl.innerHTML = `
+      <div class="sec-title" style="margin-bottom:10px;">Результаты: ${results.length}</div>
+      ${results.map(g => `
+        <div class="game-card" onclick="openGameInBot('${g.name}')">
+          <div class="game-icon">${g.icon}</div>
+          <div class="game-info">
+            <div class="game-name">${escHtml(g.name)}</div>
+            <div class="game-meta">${g.genre} · Нажми чтобы получить файлы</div>
+          </div>
+          <div class="game-arrow">›</div>
+        </div>
+      `).join('')}
+    `;
+  }
+  placeholder.style.display = 'none';
+}
+
+// ════════════════════════════════════════
+//  GENRES
+// ════════════════════════════════════════
+function renderGenres(filterGenre = null) {
+  const container = document.getElementById('genresContainer');
+  container.innerHTML = `
+    <div class="genres-grid">
+      ${GENRES.map(g => `
+        <div class="genre-chip ${filterGenre === g.name ? 'active' : ''}" onclick="filterByGenre('${g.name}')">
+          #${g.name} <span style="opacity:0.5;font-size:11px">${g.count}</span>
+        </div>
+      `).join('')}
+    </div>
+    ${filterGenre ? `
+      <div class="divider"></div>
+      <div class="sec-title">🎮 Игры в жанре: ${filterGenre}</div>
+      ${POPULAR_GAMES.filter(g => g.genre.includes(filterGenre) || Math.random() > 0.5).slice(0, 4).map(g => `
+        <div class="game-card" onclick="openGameInBot('${g.name}')">
+          <div class="game-icon">${g.icon}</div>
+          <div class="game-info">
+            <div class="game-name">${g.name}</div>
+            <div class="game-meta">${g.genre}</div>
+          </div>
+          <div class="game-arrow">›</div>
+        </div>
+      `).join('')}
+    ` : ''}
+  `;
+}
+
+function filterByGenre(genre) {
+  renderGenres(genre);
+}
+
+// ════════════════════════════════════════
+//  FAQ
+// ════════════════════════════════════════
+function renderFAQ() {
+  const container = document.getElementById('faqList');
+  container.innerHTML = FAQ_DATA.map((item, i) => `
+    <div class="faq-item" id="faq${i}">
+      <div class="faq-question" onclick="toggleFAQ(${i})">
+        <span>${item.q}</span>
+        <span class="faq-chevron">⌄</span>
+      </div>
+      <div class="faq-answer">${item.a}</div>
+    </div>
+  `).join('');
+}
+
+function toggleFAQ(i) {
+  const el = document.getElementById('faq' + i);
+  el.classList.toggle('open');
+}
+
+// ════════════════════════════════════════
+//  PROFILE
+// ════════════════════════════════════════
+function renderProfile() {
+  const joinDate = new Date().toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+  return `
+    <div class="profile-banner">
+      <div class="profile-avatar">🎮</div>
+      <div class="profile-name">${userName}</div>
+      <div class="profile-id">ID: ${userId} · Зарегистрирован ${joinDate}</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-num">${userDownloads}</div>
+        <div class="stat-label">Скачано</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">${userSearches}</div>
+        <div class="stat-label">Поисков</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">${selectedLang.toUpperCase()}</div>
+        <div class="stat-label">Язык</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📢 Подписка на канал</div>
+      <div class="card-desc" style="margin-bottom:12px;">Убедись, что ты подписан на основной канал — без него бот не отправит файлы.</div>
+      <a class="btn btn-success" href="https://t.me/+_bQ8sLeBNsQwOGYy" target="_blank">✅ Перейти в канал</a>
+    </div>
+    <div class="card">
+      <div class="card-title">⚙️ Действия</div>
+      <button class="btn btn-secondary" style="margin-top:10px" onclick="resetStats()">🔄 Сбросить статистику</button>
+    </div>
+  `;
+}
+
+function resetStats() {
+  userDownloads = 0; userSearches = 0;
+  localStorage.setItem('gamebotDownloads', '0');
+  localStorage.setItem('gamebotSearches', '0');
+  showToast('📊 Статистика сброшена');
+  document.getElementById('dynamicContent').innerHTML = renderProfile();
+}
+
+// ════════════════════════════════════════
+//  QUESTS
+// ════════════════════════════════════════
+function renderQuests() {
+  return `
+    <div class="sec-title">⚔️ Квесты</div>
+    ${QUESTS.map(q => {
+      const pct = Math.round((q.cur / q.max) * 100);
+      const done = q.cur >= q.max;
+      return `
+        <div class="quest-card">
+          <div class="quest-header">
+            <div class="quest-name">${q.name} ${done ? '✅' : ''}</div>
+            <div class="quest-reward">${q.reward}</div>
+          </div>
+          <div class="quest-desc">${q.desc}</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${pct}%"></div>
+          </div>
+          <div class="progress-text">${q.cur} / ${q.max}</div>
+        </div>
+      `;
+    }).join('')}
+    <div style="font-size:13px;color:var(--text2);text-align:center;margin-top:8px;line-height:1.6;">
+      Квесты обновляются автоматически при взаимодействии с ботом.
+    </div>
+  `;
+}
+
+// ════════════════════════════════════════
+//  SUGGEST
+// ════════════════════════════════════════
+function renderSuggest() {
+  return `
+    <div class="sec-title">💡 Предложить игру</div>
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-desc" style="margin-bottom:0">Предложи игру, которую хочешь видеть в боте. Мы рассматриваем все заявки!</div>
+    </div>
+    <input class="input-field" id="suggestName" placeholder="Название игры (обязательно)" />
+    <input class="input-field" id="suggestGenre" placeholder="Жанр (необязательно)" />
+    <textarea class="input-field" id="suggestDesc" placeholder="Комментарий (необязательно)" rows="3"></textarea>
+    <button class="btn btn-primary" onclick="submitSuggest()">🚀 Отправить предложение</button>
+    <div class="divider"></div>
+    <div class="sec-title">📋 Стол заказов</div>
+    <div class="card-desc" style="margin-bottom:12px;font-size:13px;">Официальный канал для заказов — там можно посмотреть, что уже заказали другие.</div>
+    <a class="btn btn-secondary" href="https://t.me/+FFG8EhyLHXY2NzIy" target="_blank">📋 Открыть Стол Заказов</a>
+  `;
+}
+
+function submitSuggest() {
+  const name = document.getElementById('suggestName')?.value?.trim();
+  if (!name) { showToast('⚠️ Введи название игры'); return; }
+  const msg = `💡 Предложение: ${name}`;
+  openGameInBot(name, msg);
+  showToast('✅ Переходим к боту!');
+}
+
+// ════════════════════════════════════════
+//  LANGUAGE
+// ════════════════════════════════════════
+function renderLang() {
+  const langs = [
+    { code: 'ru', flag: '🇷🇺', name: 'Русский' },
+    { code: 'en', flag: '🇬🇧', name: 'English' },
+    { code: 'uk', flag: '🇺🇦', name: 'Українська' },
+  ];
+  return `
+    <div class="sec-title">🌐 Язык интерфейса</div>
+    <div class="lang-grid">
+      ${langs.map(l => `
+        <div class="lang-btn ${selectedLang === l.code ? 'active' : ''}" onclick="setLang('${l.code}')">
+          <div class="flag">${l.flag}</div>
+          <div class="lang-name">${l.name}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card">
+      <div class="card-desc">Язык влияет на приветственные сообщения в боте. Смену языка также можно сделать командой /setlang.</div>
+    </div>
+    <button class="btn btn-primary" onclick="applyLang()">✅ Применить</button>
+  `;
+}
+
+function setLang(code) {
+  selectedLang = code;
+  localStorage.setItem('gamebotLang', code);
+  document.getElementById('dynamicContent').innerHTML = renderLang();
+  showToast('🌐 Язык выбран');
+}
+
+function applyLang() {
+  showToast('✅ Язык сохранён: ' + selectedLang.toUpperCase());
+  // Открываем бота с командой setlang
+  if (tg) tg.sendData(JSON.stringify({ action: 'setlang', lang: selectedLang }));
+}
+
+// ════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════
+const NAV_SECTIONS = {
+  home: null, // uses tabs
+  profile: renderProfile,
+  quests: renderQuests,
+  suggest: renderSuggest,
+  lang: renderLang,
+};
+
+// dynamic content overlay
+function ensureDynamicContainer() {
+  let el = document.getElementById('dynamicContent');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'dynamicContent';
+    el.style.cssText = 'position:fixed;inset:0;z-index:150;overflow-y:auto;background:var(--bg);padding:0 0 80px;animation:fadeIn 0.25s ease;';
+    document.getElementById('app').appendChild(el);
+  }
+  return el;
+}
+
+function switchNav(nav) {
+  // Update nav active
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('nav-' + nav)?.classList.add('active');
+  currentNav = nav;
+
+  if (nav === 'home') {
+    const dc = document.getElementById('dynamicContent');
+    if (dc) dc.remove();
+    return;
+  }
+
+  const renderer = NAV_SECTIONS[nav];
+  if (!renderer) return;
+  const container = ensureDynamicContainer();
+  container.innerHTML = `
+    <div style="padding:14px 16px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:rgba(10,12,20,0.9);backdrop-filter:blur(12px);position:sticky;top:0;z-index:10;">
+      <button onclick="switchNav('home')" style="background:none;border:none;color:var(--accent);font-size:22px;cursor:pointer;padding:0;line-height:1;">‹</button>
+      <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${getNavTitle(nav)}</div>
+    </div>
+    <div style="padding:16px 16px 0;" id="dynamicInner">${renderer()}</div>
+  `;
+}
+
+function getNavTitle(nav) {
+  return { profile: '👤 Профиль', quests: '⚔️ Квесты', suggest: '💡 Предложить', lang: '🌐 Язык' }[nav] || nav;
+}
+
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + name)?.classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const tabs = document.querySelectorAll('.tab-btn');
+  const map = { search: 0, genres: 1, order: 2, faq: 3, speed: 4 };
+  if (map[name] !== undefined) tabs[map[name]]?.classList.add('active');
+  currentSection = name;
+}
+
+// ════════════════════════════════════════
+//  ACTIONS
+// ════════════════════════════════════════
+function openGameInBot(gameName, customMsg) {
+  userDownloads++;
+  localStorage.setItem('gamebotDownloads', userDownloads);
+
+  const msg = customMsg || gameName;
+  if (tg?.openTelegramLink) {
+    // Deep link to bot with game name
+    tg.openTelegramLink(`https://t.me/notorgames_bot?start=${encodeURIComponent(gameName)}`);
+  } else {
+    // fallback
+    window.open(`https://t.me/notorgames_bot?start=${encodeURIComponent(gameName)}`, '_blank');
+  }
+  showToast(`🎮 Ищем: ${gameName}`);
+}
+
+function loadRandom() {
+  const all = [...POPULAR_GAMES,
+    { name: 'My Dream Setup', genre: 'Simulator', icon: '🖥️' },
+    { name: 'Sectio 8', genre: 'Shooter', icon: '🔫' },
+    { name: 'Альтушка', genre: 'Visual Novel', icon: '🎨' },
+  ];
+  const results = [...all].sort(() => Math.random() - 0.5).slice(0, 6);
+  const container = document.getElementById('searchResults');
+  const placeholder = document.getElementById('searchPlaceholder');
+  placeholder.style.display = 'none';
+  container.innerHTML = `
+    <div class="sec-title" style="margin-bottom:10px;">🎲 Случайная подборка</div>
+    ${results.map(g => `
+      <div class="game-card" onclick="openGameInBot('${g.name}')">
+        <div class="game-icon">${g.icon}</div>
+        <div class="game-info">
+          <div class="game-name">${g.name}</div>
+          <div class="game-meta">${g.genre}</div>
+        </div>
+        <div class="game-arrow">›</div>
+      </div>
+    `).join('')}
+    <button class="btn btn-secondary" style="margin-top:4px" onclick="loadRandom()">🎲 Ещё раз</button>
+  `;
+}
+
+function openOrderWithName(name) {
+  document.getElementById('orderText').value = name;
+  showSection('order');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-btn')[2]?.classList.add('active');
+}
+
+function submitOrder() {
+  const text = document.getElementById('orderText')?.value?.trim();
+  if (!text) { showToast('⚠️ Введи название игры'); return; }
+  openGameInBot(text, `📋 Заказ: ${text}`);
+  document.getElementById('orderText').value = '';
+  showToast('✅ Переходим к боту!');
+}
+
+function openLink(url) {
+  if (tg?.openLink) tg.openLink(url);
+  else window.open(url, '_blank');
+}
+
+// ════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ════════════════════════════════════════
+//  LAUNCH
+// ════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
