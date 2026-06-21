@@ -781,7 +781,7 @@
         <div style="font-size:36px;margin-bottom:10px;">📋</div>
         <div class="card-title">Нет нужной игры?</div>
         <div class="card-desc" style="margin-bottom:14px;">Оставь заявку в Столе Заказов — и мы добавим её! Там же можно посмотреть, что уже заказали другие.</div>
-        <a class="btn btn-primary" href="https://t.me/+FFG8EhyLHXY2NzIy" target="_blank">📋 Перейти в Стол Заказов</a>
+        <a class="btn btn-primary" onclick="openLink('https://t.me/+FFG8EhyLHXY2NzIy')">📋 Перейти в Стол Заказов</a>
       </div>
 
       <div class="divider"></div>
@@ -889,8 +889,8 @@
         </div>
       </div>
 
-      <a class="btn btn-primary" href="https://t.me/NotorVPN" target="_blank">🛡️ Быстрый VPN — NotorVPN</a>
-      <a class="btn btn-secondary" href="https://desktop.telegram.org/" target="_blank">🖥️ Скачать Telegram Desktop</a>
+      <a class="btn btn-primary" onclick="openLink('https://t.me/NotorVPN')">🛡️ Быстрый VPN — NotorVPN</a>
+      <a class="btn btn-secondary" onclick="openLink('https://desktop.telegram.org/')">🖥️ Скачать Telegram Desktop</a>
 
       <div class="divider"></div>
       <div style="font-size:13px;color:var(--text2);text-align:center;line-height:1.6;">
@@ -1026,13 +1026,19 @@ const FAQ_DATA = [
   },
 ];
 
-const QUESTS = [
-  { name: '🎮 Первопроходец', desc: 'Скачай свою первую игру через бота', reward: '+1 заказ', max: 1, cur: Math.min(userDownloads, 1) },
-  { name: '📥 Качаю всё подряд', desc: 'Скачай 10 игр через бота', reward: 'Приоритет', max: 10, cur: Math.min(userDownloads, 10) },
-  { name: '🔍 Следопыт', desc: 'Выполни 20 поисков', reward: '+2 заказа', max: 20, cur: Math.min(userSearches, 20) },
-  { name: '📢 Амбассадор', desc: 'Пригласи друга через реферальную ссылку', reward: 'VIP статус', max: 1, cur: 0 },
-  { name: '🌍 Полиглот', desc: 'Смени язык интерфейса', reward: '+1 заказ', max: 1, cur: selectedLang !== 'ru' ? 1 : 0 },
-];
+// ИСПРАВЛЕНИЕ: раньше QUESTS был константой, вычисленной один раз при
+// загрузке страницы — прогресс квестов "застывал" и не обновлялся после
+// скачиваний/поисков/сброса статистики. Теперь это функция, которая
+// пересчитывает прогресс заново при каждом открытии раздела.
+function getQuests() {
+  return [
+    { name: '🎮 Первопроходец', desc: 'Скачай свою первую игру через бота', reward: '+1 заказ', max: 1, cur: Math.min(userDownloads, 1) },
+    { name: '📥 Качаю всё подряд', desc: 'Скачай 10 игр через бота', reward: 'Приоритет', max: 10, cur: Math.min(userDownloads, 10) },
+    { name: '🔍 Следопыт', desc: 'Выполни 20 поисков', reward: '+2 заказа', max: 20, cur: Math.min(userSearches, 20) },
+    { name: '📢 Амбассадор', desc: 'Пригласи друга через реферальную ссылку', reward: 'VIP статус', max: 1, cur: 0 },
+    { name: '🌍 Полиглот', desc: 'Смени язык интерфейса', reward: '+1 заказ', max: 1, cur: selectedLang !== 'ru' ? 1 : 0 },
+  ];
+}
 
 // ════════════════════════════════════════
 //  INIT
@@ -1212,7 +1218,7 @@ function renderProfile() {
     <div class="card">
       <div class="card-title">📢 Подписка на канал</div>
       <div class="card-desc" style="margin-bottom:12px;">Убедись, что ты подписан на основной канал — без него бот не отправит файлы.</div>
-      <a class="btn btn-success" href="https://t.me/+_bQ8sLeBNsQwOGYy" target="_blank">✅ Перейти в канал</a>
+      <a class="btn btn-success" onclick="openLink('https://t.me/+_bQ8sLeBNsQwOGYy')">✅ Перейти в канал</a>
     </div>
     <div class="card">
       <div class="card-title">⚙️ Действия</div>
@@ -1235,7 +1241,7 @@ function resetStats() {
 function renderQuests() {
   return `
     <div class="sec-title">⚔️ Квесты</div>
-    ${QUESTS.map(q => {
+    ${getQuests().map(q => {
       const pct = Math.round((q.cur / q.max) * 100);
       const done = q.cur >= q.max;
       return `
@@ -1274,7 +1280,7 @@ function renderSuggest() {
     <div class="divider"></div>
     <div class="sec-title">📋 Стол заказов</div>
     <div class="card-desc" style="margin-bottom:12px;font-size:13px;">Официальный канал для заказов — там можно посмотреть, что уже заказали другие.</div>
-    <a class="btn btn-secondary" href="https://t.me/+FFG8EhyLHXY2NzIy" target="_blank">📋 Открыть Стол Заказов</a>
+    <a class="btn btn-secondary" onclick="openLink('https://t.me/+FFG8EhyLHXY2NzIy')">📋 Открыть Стол Заказов</a>
   `;
 }
 
@@ -1321,8 +1327,23 @@ function setLang(code) {
 
 function applyLang() {
   showToast('✅ Язык сохранён: ' + selectedLang.toUpperCase());
-  // Открываем бота с командой setlang
-  if (tg) tg.sendData(JSON.stringify({ action: 'setlang', lang: selectedLang }));
+  // ИСПРАВЛЕНИЕ: tg.sendData() работает только если Mini App открыт через
+  // Reply-кнопку "Web App". Если приложение открыто через кнопку меню бота
+  // (самый частый случай) — sendData() бросает ошибку, и язык никуда не
+  // передаётся. Оборачиваем в try/catch и в этом случае открываем бота напрямую.
+  try {
+    if (tg?.sendData) {
+      tg.sendData(JSON.stringify({ action: 'setlang', lang: selectedLang }));
+      return;
+    }
+  } catch (e) {
+    console.warn('sendData недоступен, открываю бота напрямую:', e);
+  }
+  if (tg?.openTelegramLink) {
+    tg.openTelegramLink(`https://t.me/notorgames_bot?start=setlang_${selectedLang}`);
+  } else {
+    window.open(`https://t.me/notorgames_bot?start=setlang_${selectedLang}`, '_blank');
+  }
 }
 
 // ════════════════════════════════════════
@@ -1446,8 +1467,20 @@ function submitOrder() {
 }
 
 function openLink(url) {
-  if (tg?.openLink) tg.openLink(url);
-  else window.open(url, '_blank');
+  // ИСПРАВЛЕНИЕ: для ссылок t.me Telegram требует openTelegramLink(),
+  // а не openLink() — иначе инвайт-ссылки на каналы (особенно приватные "+...")
+  // открываются ненадёжно или не открываются вовсе.
+  if (tg) {
+    if (url.includes('t.me/') && tg.openTelegramLink) {
+      tg.openTelegramLink(url);
+      return;
+    }
+    if (tg.openLink) {
+      tg.openLink(url);
+      return;
+    }
+  }
+  window.open(url, '_blank');
 }
 
 // ════════════════════════════════════════
